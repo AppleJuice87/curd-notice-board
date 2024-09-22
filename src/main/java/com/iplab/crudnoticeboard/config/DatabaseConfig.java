@@ -27,7 +27,7 @@ public class DatabaseConfig {
     // 따라서 이 파일은 데이터베이스 연결 설정을 위한 파일이며, 실제 계정이름, 비밀번호 등은 별도의 파일이나 환경변수에 저장하는 것이 좋음.
 
     // 그 환경변수는 /src/main/resources/application.properties 파일에 저장되어 있음.
-    // 바로가기 : todo #1-3 누르면 바로 이동 가능.
+    // 저기 저장해두고 그걸 수정하면, 모든 소스파일에 있는 값들을 바꿀 수 있으므로, 코드 유지보수 효율성 증가.
 
     private static final String URL = props.getProperty("db.url");
     private static final String USER = props.getProperty("db.user");
