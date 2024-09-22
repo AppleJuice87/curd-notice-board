@@ -1,0 +1,148 @@
+package com.iplab.crudnoticeboard.service.impl;
+
+import com.iplab.crudnoticeboard.config.DatabaseConfig;
+import com.iplab.crudnoticeboard.model.Post;
+import com.iplab.crudnoticeboard.service.PostService;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PostServiceImpl implements PostService {
+    public void createPost(Post post) throws SQLException {
+        // TODO #3-1 : 게시물 생성 로직 구현
+        // - SQL 쿼리 준비
+        // - 데이터베이스 연결 - try-with-resources 사용
+        // - PreparedStatement 설정
+        // - 쿼리 실행 및 리소스 정리
+
+        // TODO #3-1-1 : Connection 생성하는법. config에서 가져옴.
+        // Connection conn = DatabaseConfig.getConnection();
+        
+        String sql = "INSERT INTO posts (title, content, nickname, password, is_locked, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, post.getTitle());
+            // 추가 #1 : content
+            // 추가 #1 : nickname
+            // 추가 #1 : password
+            // 추가 #1 : is_locked
+            pstmt.setTimestamp(6, new Timestamp(System.currentTimeMillis())); // 현재 시간 추가
+            pstmt.executeUpdate();
+        }
+    }
+
+    public List<Post> getAllPosts() throws SQLException {
+        // TODO #3-2 : 모든 게시물 조회 로직 구현
+        // - SQL 쿼리 준비
+        // - 데이터베이스 연결 - try-with-resources 사용
+        // - Statement 생성 및 쿼리 실행
+        // - ResultSet 처리
+        // - 결과 반환
+        
+        List<Post> posts = new ArrayList<>();
+        String sql = "SELECT id, title, nickname FROM posts";
+        try (Connection conn = DatabaseConfig.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Post post = new Post();
+
+                // 추가 : id
+                // 추가 : title
+                // 추가 : nickname
+
+                posts.add(post);
+            }
+        }
+        return posts;
+    }
+
+    public Post getPostById(int id) throws SQLException {
+        // TODO #3-3 : 특정 게시물 조회 로직 구현
+        // - SQL 쿼리 준비
+        // - 데이터베이스 연결 - try-with-resources 사용
+        // - PreparedStatement 설정
+        // - 쿼리 실행 및 ResultSet 처리
+        // - 결과 반환
+
+        String sql = "";
+        try () {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Post post = new Post();
+                    // 추가 : id
+                    // 추가 : title
+                    // 추가 : nickname
+                    // 추가 : content
+                    // 추가 : password
+                    // 추가 : is_locked
+                    // 추가 : created_at
+                    return post;
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean verifyPassword(int id, String password) throws SQLException {
+        // TODO #3-4 : 비밀번호 검증 로직 구현
+        // - SQL 쿼리 준비
+        // - 데이터베이스 연결 - try-with-resources 사용
+        // - PreparedStatement 설정
+        // - 쿼리 실행 및 ResultSet 처리
+        // - 결과 반환
+
+        String sql = "";
+        try () {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    // 비밀번호 일치한지 확인 (.equals)
+                    return ;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void updatePost(Post post) throws SQLException {
+        // TODO #3-5 : 게시물 업데이트 로직 구현
+        // - SQL 쿼리 준비
+        // - 데이터베이스 연결 - try-with-resources 사용
+        // - PreparedStatement 설정
+        // - 쿼리 실행 및 리소스 정리
+
+        String sql = "";
+        try () {
+            // 추가 : title
+            // 추가 : content
+            // 추가 : is_locked
+            // 추가 : id
+            
+            //실행
+        }
+    }
+
+    public void deletePost(int id) throws SQLException {
+        // TODO #3-6 : 게시물 삭제 로직 구현
+        // - SQL 쿼리 준비
+        // - 데이터베이스 연결 - try-with-resources 사용
+        // - PreparedStatement 설정
+        // - 쿼리 실행 및 리소스 정리
+        
+        String sql = "";
+        try () {
+            // 추가 : id
+
+            // 실행
+        }
+    }
+
+    // test용
+//    protected Connection getConnection() throws SQLException {
+//        // 실제 데이터베이스 연결 로직 구현
+//        return DriverManager.getConnection("jdbc:mysql://localhost:3306/yourdb", "username", "password");
+//    }
+}
