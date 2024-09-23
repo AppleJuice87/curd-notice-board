@@ -111,7 +111,7 @@ public class PostServiceImpl implements PostService {
 
                     // 추가 : created_at
                     post.setCreatedAt(rs.getTimestamp("created_at"));
-                    
+
                     return post;
                 }
             }
@@ -127,13 +127,15 @@ public class PostServiceImpl implements PostService {
         // - 쿼리 실행 및 ResultSet 처리
         // - 결과 반환
 
-        String sql = "";
-        try () {
+        String sql = "SELECT password FROM posts WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
+                    String real_password = rs.getString("password");
                     // 비밀번호 일치한지 확인 (.equals)
-                    return ;
+                    return real_password.equls(password);
                 }
             }
         }
