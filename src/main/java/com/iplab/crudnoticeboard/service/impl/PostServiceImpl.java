@@ -23,10 +23,10 @@ public class PostServiceImpl implements PostService {
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, post.getTitle());
-            // 추가 #1 : content
-            // 추가 #1 : nickname
-            // 추가 #1 : password
-            // 추가 #1 : is_locked
+            pstmt.setString(2, post.getContent());
+            pstmt.setString(3, post.getNickname());
+            pstmt.setString(4, post.getPassword());
+            pstmt.setBoolean(5, post.isLocked());
             pstmt.setTimestamp(6, new Timestamp(System.currentTimeMillis())); // 현재 시간 추가
             pstmt.executeUpdate();
         }
@@ -39,19 +39,20 @@ public class PostServiceImpl implements PostService {
         // - Statement 생성 및 쿼리 실행
         // - ResultSet 처리
         // - 결과 반환
-        
+
+        // 게시판 특성상 날짜 데이터와 잠김 유무를 불러 올 수 있게 추가로 쿼리문을 작성하였습니다.
         List<Post> posts = new ArrayList<>();
-        String sql = "SELECT id, title, nickname FROM posts";
+        String sql = "SELECT id, title, nickname, created_at, is_locked FROM posts";
         try (Connection conn = DatabaseConfig.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Post post = new Post();
-
-                // 추가 : id
-                // 추가 : title
-                // 추가 : nickname
-
+                post.setId(rs.getInt("id"));
+                post.setTitle(rs.getString("title"));
+                post.setNickname(rs.getString("nickname"));
+                post.setCreatedAt(rs.getTimestamp("created_at"));
+                post.setLocked(rs.getBoolean("is_locked"));
                 posts.add(post);
             }
         }
@@ -66,19 +67,20 @@ public class PostServiceImpl implements PostService {
         // - 쿼리 실행 및 ResultSet 처리
         // - 결과 반환
 
-        String sql = "";
-        try () {
+        String sql = "SELECT * FROM posts WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Post post = new Post();
-                    // 추가 : id
-                    // 추가 : title
-                    // 추가 : nickname
-                    // 추가 : content
-                    // 추가 : password
-                    // 추가 : is_locked
-                    // 추가 : created_at
+                    post.setId(rs.getInt("id"));
+                    post.setTitle(rs.getString("title"));
+                    post.setContent(rs.getString("content"));
+                    post.setNickname(rs.getString("nickname"));
+                    post.setPassword(rs.getString("password"));
+                    post.setLocked(rs.getBoolean("is_locked"));
+                    post.setCreatedAt(rs.getTimestamp("created_at"));
                     return post;
                 }
             }
@@ -94,13 +96,13 @@ public class PostServiceImpl implements PostService {
         // - 쿼리 실행 및 ResultSet 처리
         // - 결과 반환
 
-        String sql = "";
-        try () {
+        String sql = "SELECT password FROM posts WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // 비밀번호 일치한지 확인 (.equals)
-                    return ;
+                    return password.equals(rs.getString("password"));
                 }
             }
         }
@@ -114,14 +116,19 @@ public class PostServiceImpl implements PostService {
         // - PreparedStatement 설정
         // - 쿼리 실행 및 리소스 정리
 
-        String sql = "";
-        try () {
-            // 추가 : title
-            // 추가 : content
-            // 추가 : is_locked
-            // 추가 : id
-            
-            //실행
+        String sql = "UPDATE posts SET title = ?, content = ?, nickname = ? WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, post.getTitle());
+            pstmt.setString(2, post.getContent());
+            pstmt.setString(3, post.getNickname());
+            pstmt.setInt(4, post.getId());
+
+            // executeUpdate() 메소드는 Update, Delete, Insert 구문에 영향을 받은 row를 counting 하여 반환합니다.
+            int result = pstmt.executeUpdate();
+
+            // 반환 받은 결과를 임시로 출력 해보았습니다.
+            System.out.println(result);
         }
     }
 
@@ -132,11 +139,14 @@ public class PostServiceImpl implements PostService {
         // - PreparedStatement 설정
         // - 쿼리 실행 및 리소스 정리
         
-        String sql = "";
-        try () {
-            // 추가 : id
+        String sql = "DELETE FROM posts WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
 
-            // 실행
+            // 쿼리 결과를 출력하기 위해서 int 형으로 받아서 임시로 출력해보았습니다.
+            int result = pstmt.executeUpdate();
+            System.out.println(result);
         }
     }
 

@@ -30,8 +30,11 @@ class PostServiceTest {
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
+
+        // @Override
+        // 테스트 코드에서 Override 어노테이션에서 오류가 발생하여 부득이하게 제거했습니다
+
         postService = new PostServiceImpl() {
-            @Override
             protected Connection getConnection() throws SQLException {
                 return mockConnection;
             }
