@@ -16,6 +16,7 @@ public class PostServiceImpl implements PostService {
         // - PreparedStatement 설정
         // - 쿼리 실행 및 리소스 정리
 
+
         // TODO #3-1-1 : Connection 생성하는법. config에서 가져옴.
         // Connection conn = DatabaseConfig.getConnection();
         
@@ -23,10 +24,19 @@ public class PostServiceImpl implements PostService {
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, post.getTitle());
+
             // 추가 #1 : content
+            pstmt.setString(2, post.getContent());
+
             // 추가 #1 : nickname
+            pstmt.setString(3, post.getNickname());
+
             // 추가 #1 : password
+            pstmt.setString(4, post.getPassword());
+
             // 추가 #1 : is_locked
+            pstmt.setBoolean(5, post.isLocked());
+
             pstmt.setTimestamp(6, new Timestamp(System.currentTimeMillis())); // 현재 시간 추가
             pstmt.executeUpdate();
         }
@@ -49,9 +59,14 @@ public class PostServiceImpl implements PostService {
                 Post post = new Post();
 
                 // 추가 : id
-                // 추가 : title
-                // 추가 : nickname
+                post.setId(rs.getInt("id"));
 
+                // 추가 : title
+                post.setTitle(rs.getString("title"));
+
+                // 추가 : nickname
+                post.setNickname(rs.getString("nickname"));
+                
                 posts.add(post);
             }
         }
