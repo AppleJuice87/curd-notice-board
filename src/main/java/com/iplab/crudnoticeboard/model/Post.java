@@ -14,65 +14,72 @@ public class Post {
     // 기본 생성자
     public Post() {}
 
-    // 모든 필드를 포함하는 생성자 (필드 순서대로)
-    public Post() {
+    // 모든 필드를 포함하는 생성자
+    public Post(int id, String title, String content, String nickname, String password, Date createdAt, boolean locked) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.nickname = nickname;
+        this.password = password;
+        this.createdAt = createdAt;
+        this.locked = locked;
     }
 
-    // Getter Setter
+    // Getter 및 Setter 메소드
     public int getId() {
-        return ;
+        return id;
     }
 
     public void setId(int id) {
-        ;
+        this.id = id;
     }
 
     public String getTitle() {
-        return ;
+        return title;
     }
 
     public void setTitle(String title) {
-        ;
+        this.title = title;
     }
 
     public String getContent() {
-        return ;
+        return content;
     }
 
     public void setContent(String content) {
-        ;
+        this.content = content;
     }
 
     public String getNickname() {
-        return ;
+        return nickname;
     }
 
     public void setNickname(String nickname) {
-        ;
+        this.nickname = nickname;
     }
 
     public String getPassword() {
-        return ;
+        return password;
     }
 
     public void setPassword(String password) {
-        ;
+        this.password = password;
     }
 
     public Date getCreatedAt() {
-        return ;
+        return createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
-        ;
+        this.createdAt = createdAt;
     }
 
     public boolean isLocked() {
-        return ;
+        return locked;
     }
 
     public void setLocked(boolean locked) {
-        ;
+        this.locked = locked;
     }
 
     // toString 메소드 (디버깅 및 로깅에 유용)

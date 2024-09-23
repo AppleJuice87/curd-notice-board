@@ -10,36 +10,19 @@ import java.util.List;
 
 public class PostServiceImpl implements PostService {
     public void createPost(Post post) throws SQLException {
-        // TODO #3-1 : 게시물 생성 로직 구현
-        // - SQL 쿼리 준비
-        // - 데이터베이스 연결 - try-with-resources 사용
-        // - PreparedStatement 설정
-        // - 쿼리 실행 및 리소스 정리
-
-        // TODO #3-1-1 : Connection 생성하는법. config에서 가져옴.
-        // Connection conn = DatabaseConfig.getConnection();
-        
-        String sql = "INSERT INTO posts (title, content, nickname, password, is_locked, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO posts (title, content, nickname, password, is_locked) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, post.getTitle());
-            // 추가 #1 : content
-            // 추가 #1 : nickname
-            // 추가 #1 : password
-            // 추가 #1 : is_locked
-            pstmt.setTimestamp(6, new Timestamp(System.currentTimeMillis())); // 현재 시간 추가
+            pstmt.setString(2, post.getContent());
+            pstmt.setString(3, post.getNickname());
+            pstmt.setString(4, post.getPassword());
+            pstmt.setBoolean(5, post.isLocked());
             pstmt.executeUpdate();
         }
     }
 
     public List<Post> getAllPosts() throws SQLException {
-        // TODO #3-2 : 모든 게시물 조회 로직 구현
-        // - SQL 쿼리 준비
-        // - 데이터베이스 연결 - try-with-resources 사용
-        // - Statement 생성 및 쿼리 실행
-        // - ResultSet 처리
-        // - 결과 반환
-        
         List<Post> posts = new ArrayList<>();
         String sql = "SELECT id, title, nickname FROM posts";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -47,11 +30,9 @@ public class PostServiceImpl implements PostService {
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Post post = new Post();
-
-                // 추가 : id
-                // 추가 : title
-                // 추가 : nickname
-
+                post.setId(rs.getInt("id"));
+                post.setTitle(rs.getString("title"));
+                post.setNickname(rs.getString("nickname"));
                 posts.add(post);
             }
         }
@@ -59,26 +40,19 @@ public class PostServiceImpl implements PostService {
     }
 
     public Post getPostById(int id) throws SQLException {
-        // TODO #3-3 : 특정 게시물 조회 로직 구현
-        // - SQL 쿼리 준비
-        // - 데이터베이스 연결 - try-with-resources 사용
-        // - PreparedStatement 설정
-        // - 쿼리 실행 및 ResultSet 처리
-        // - 결과 반환
-
-        String sql = "";
-        try () {
+        String sql = "SELECT * FROM posts WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Post post = new Post();
-                    // 추가 : id
-                    // 추가 : title
-                    // 추가 : nickname
-                    // 추가 : content
-                    // 추가 : password
-                    // 추가 : is_locked
-                    // 추가 : created_at
+                    post.setId(rs.getInt("id"));
+                    post.setTitle(rs.getString("title"));
+                    post.setContent(rs.getString("content"));
+                    post.setNickname(rs.getString("nickname"));
+                    post.setCreatedAt(rs.getDate("created_at"));
+                    post.setLocked(rs.getBoolean("is_locked"));
                     return post;
                 }
             }
@@ -87,20 +61,13 @@ public class PostServiceImpl implements PostService {
     }
 
     public boolean verifyPassword(int id, String password) throws SQLException {
-        // TODO #3-4 : 비밀번호 검증 로직 구현
-        // - SQL 쿼리 준비
-        // - 데이터베이스 연결 - try-with-resources 사용
-        // - PreparedStatement 설정
-        // - 쿼리 실행 및 ResultSet 처리
-        // - 결과 반환
-
-        String sql = "";
-        try () {
+        String sql = "SELECT password FROM posts WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // 비밀번호 일치한지 확인 (.equals)
-                    return ;
+                    return password.equals(rs.getString("password"));
                 }
             }
         }
@@ -108,39 +75,26 @@ public class PostServiceImpl implements PostService {
     }
 
     public void updatePost(Post post) throws SQLException {
-        // TODO #3-5 : 게시물 업데이트 로직 구현
-        // - SQL 쿼리 준비
-        // - 데이터베이스 연결 - try-with-resources 사용
-        // - PreparedStatement 설정
-        // - 쿼리 실행 및 리소스 정리
-
-        String sql = "";
-        try () {
-            // 추가 : title
-            // 추가 : content
-            // 추가 : is_locked
-            // 추가 : id
-            
-            //실행
+        String sql = "UPDATE posts SET title = ?, content = ?, is_locked = ? WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, post.getTitle());
+            pstmt.setString(2, post.getContent());
+            pstmt.setBoolean(3, post.isLocked());
+            pstmt.setInt(4, post.getId());
+            pstmt.executeUpdate();
         }
     }
 
     public void deletePost(int id) throws SQLException {
-        // TODO #3-6 : 게시물 삭제 로직 구현
-        // - SQL 쿼리 준비
-        // - 데이터베이스 연결 - try-with-resources 사용
-        // - PreparedStatement 설정
-        // - 쿼리 실행 및 리소스 정리
-        
-        String sql = "";
-        try () {
-            // 추가 : id
-
-            // 실행
+        String sql = "DELETE FROM posts WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
         }
     }
 
-    // test용
 //    protected Connection getConnection() throws SQLException {
 //        // 실제 데이터베이스 연결 로직 구현
 //        return DriverManager.getConnection("jdbc:mysql://localhost:3306/yourdb", "username", "password");
