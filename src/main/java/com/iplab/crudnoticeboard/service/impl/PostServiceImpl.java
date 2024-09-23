@@ -81,19 +81,37 @@ public class PostServiceImpl implements PostService {
         // - 쿼리 실행 및 ResultSet 처리
         // - 결과 반환
 
-        String sql = "";
-        try () {
+        String sql = "SELECT id, title, content, nickname, " +
+                "password, is_locked, created_at posts WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Post post = new Post();
+
                     // 추가 : id
+                    post.setId(rs.getInt("id"));
+
                     // 추가 : title
+                    post.setTitle(rs.getString("title"));
+
                     // 추가 : nickname
+                    post.setNickname(rs.getString("nickname"));
+
                     // 추가 : content
+                    post.setContent(rs.getString("content"));
+
+
                     // 추가 : password
+                    post.setPassword(rs.getString("password"));
+
                     // 추가 : is_locked
+                    post.setLocked(rs.getBoolean("is_locked"));
+
                     // 추가 : created_at
+                    post.setCreatedAt(rs.getTimestamp("created_at"));
+                    
                     return post;
                 }
             }
