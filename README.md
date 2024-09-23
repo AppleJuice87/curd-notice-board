@@ -9,7 +9,3 @@ backend
 
 frontend
 - React
-
-서무진이 바꾼것.
-
-SIM
