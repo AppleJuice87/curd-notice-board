@@ -135,7 +135,7 @@ public class PostServiceImpl implements PostService {
                 if (rs.next()) {
                     String real_password = rs.getString("password");
                     // 비밀번호 일치한지 확인 (.equals)
-                    return real_password.equls(password);
+                    return real_password.equals(password);
                 }
             }
         }
@@ -177,11 +177,13 @@ public class PostServiceImpl implements PostService {
         // - PreparedStatement 설정
         // - 쿼리 실행 및 리소스 정리
         
-        String sql = "";
-        try () {
+        String sql = "DELETE FROM posts WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
             // 추가 : id
-
+            pstmt.setInt(1,id);
             // 실행
+            pstmt.executeUpdate();
         }
     }
 
