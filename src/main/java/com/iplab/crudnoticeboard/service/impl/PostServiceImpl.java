@@ -149,14 +149,24 @@ public class PostServiceImpl implements PostService {
         // - PreparedStatement 설정
         // - 쿼리 실행 및 리소스 정리
 
-        String sql = "";
-        try () {
+        String sql = "UPDATE posts SET title = ?, content = ?, is_locked = ? WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             // 추가 : title
+            pstmt.setString(1, post.getTitle());
+
             // 추가 : content
+            pstmt.setString(2,post.getContent());
+
             // 추가 : is_locked
+            pstmt.setBoolean(3,post.isLocked());
+
             // 추가 : id
+            pstmt.setInt(4, post.getId());
             
             //실행
+            pstmt.executeUpdate();
         }
     }
 
