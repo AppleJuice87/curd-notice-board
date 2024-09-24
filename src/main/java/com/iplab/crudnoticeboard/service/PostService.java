@@ -1,6 +1,7 @@
 package com.iplab.crudnoticeboard.service;
 
 import com.iplab.crudnoticeboard.model.Post;
+import com.iplab.crudnoticeboard.model.Attachment;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -18,4 +19,7 @@ public interface PostService {
     boolean verifyPassword(int id, String password) throws SQLException;
     void updatePost(Post post) throws SQLException;
     void deletePost(int id) throws SQLException;
+    void saveAttachment(int postId, Attachment attachment) throws SQLException;
+    List<Attachment> getAttachmentsByPostId(int postId) throws SQLException;
+    void deleteAttachment(int attachmentId) throws SQLException;
 }

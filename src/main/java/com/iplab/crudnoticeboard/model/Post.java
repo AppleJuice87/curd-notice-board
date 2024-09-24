@@ -1,6 +1,7 @@
 package com.iplab.crudnoticeboard.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Post {
     private int id;
@@ -10,12 +11,13 @@ public class Post {
     private String password;
     private Date createdAt;
     private boolean locked;
+    private List<Attachment> attachments;
 
     // 기본 생성자
     public Post() {}
 
     // 모든 필드를 포함하는 생성자
-    public Post(int id, String title, String content, String nickname, String password, Date createdAt, boolean locked) {
+    public Post(int id, String title, String content, String nickname, String password, Date createdAt, boolean locked, List<Attachment> attachments) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -23,6 +25,7 @@ public class Post {
         this.password = password;
         this.createdAt = createdAt;
         this.locked = locked;
+        this.attachments = attachments;
     }
 
     // Getter 및 Setter 메소드
@@ -82,6 +85,14 @@ public class Post {
         this.locked = locked;
     }
 
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
+    }
+
     // toString 메소드 (디버깅 및 로깅에 유용)
     @Override
     public String toString() {
@@ -92,6 +103,7 @@ public class Post {
                 ", nickname='" + nickname + '\'' +
                 ", createdAt=" + createdAt +
                 ", locked=" + locked +
+                ", attachments=" + attachments +
                 '}';
     }
 }

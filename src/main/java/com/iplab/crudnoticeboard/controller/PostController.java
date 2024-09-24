@@ -1,16 +1,22 @@
 package com.iplab.crudnoticeboard.controller;
 
+import com.iplab.crudnoticeboard.model.Attachment;
 import com.iplab.crudnoticeboard.model.Post;
 import com.iplab.crudnoticeboard.service.impl.PostServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/api/posts/*")
@@ -24,12 +30,56 @@ public class PostController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Post post = objectMapper.readValue(req.getReader(), Post.class);
-        try {
-            postService.createPost(post);
-            resp.setStatus(HttpServletResponse.SC_CREATED);
-        } catch (SQLException e) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        if (ServletFileUpload.isMultipartContent(req)) {
+            try {
+                List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(req);
+                Post post = new Post();
+                List<Attachment> attachments = new ArrayList<>();
+
+                for (FileItem item : items) {
+                    if (item.isFormField()) {
+                        // 일반 폼 필드 처리
+                        String fieldName = item.getFieldName();
+                        String fieldValue = item.getString("UTF-8");
+                        switch (fieldName) {
+                            case "title":
+                                post.setTitle(fieldValue);
+                                break;
+                            case "content":
+                                post.setContent(fieldValue);
+                                break;
+                            case "nickname":
+                                post.setNickname(fieldValue);
+                                break;
+                            case "password":
+                                post.setPassword(fieldValue);
+                                break;
+                            case "locked":
+                                post.setLocked(Boolean.parseBoolean(fieldValue));
+                                break;
+                        }
+                    } else {
+                        // 파일 처리
+                        String fileName = new File(item.getName()).getName();
+                        String filePath = getServletContext().getRealPath("/uploads") + File.separator + fileName;
+                        File storeFile = new File(filePath);
+                        item.write(storeFile);
+
+                        Attachment attachment = new Attachment();
+                        attachment.setFileName(fileName);
+                        attachment.setFilePath(filePath);
+                        attachments.add(attachment);
+                    }
+                }
+
+                post.setAttachments(attachments);
+                postService.createPost(post);
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+            } catch (Exception e) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            }
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request");
         }
     }
 
@@ -71,17 +121,58 @@ public class PostController extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int id = Integer.parseInt(req.getPathInfo().substring(1));
-        Post post = objectMapper.readValue(req.getReader(), Post.class);
-        post.setId(id);
-        try {
-            if (postService.verifyPassword(id, post.getPassword())) {
-                postService.updatePost(post);
-                resp.setStatus(HttpServletResponse.SC_OK);
-            } else {
-                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid password");
+        if (ServletFileUpload.isMultipartContent(req)) {
+            try {
+                List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(req);
+                Post post = new Post();
+                post.setId(id);
+                List<Attachment> attachments = new ArrayList<>();
+
+                for (FileItem item : items) {
+                    if (item.isFormField()) {
+                        // 일반 폼 필드 처리
+                        String fieldName = item.getFieldName();
+                        String fieldValue = item.getString("UTF-8");
+                        switch (fieldName) {
+                            case "title":
+                                post.setTitle(fieldValue);
+                                break;
+                            case "content":
+                                post.setContent(fieldValue);
+                                break;
+                            case "password":
+                                post.setPassword(fieldValue);
+                                break;
+                            case "locked":
+                                post.setLocked(Boolean.parseBoolean(fieldValue));
+                                break;
+                        }
+                    } else {
+                        // 파일 처리
+                        String fileName = new File(item.getName()).getName();
+                        String filePath = getServletContext().getRealPath("/uploads") + File.separator + fileName;
+                        File storeFile = new File(filePath);
+                        item.write(storeFile);
+
+                        Attachment attachment = new Attachment();
+                        attachment.setFileName(fileName);
+                        attachment.setFilePath(filePath);
+                        attachments.add(attachment);
+                    }
+                }
+
+                post.setAttachments(attachments);
+                if (postService.verifyPassword(id, post.getPassword())) {
+                    postService.updatePost(post);
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid password");
+                }
+            } catch (Exception e) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             }
-        } catch (SQLException e) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request");
         }
     }
 
